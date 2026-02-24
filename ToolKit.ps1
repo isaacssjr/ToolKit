@@ -233,7 +233,7 @@ $btnApply.Add_Click({
     if ($chkStaticIP.IsChecked)     { Set-StaticIP }
     if ($chkDHCPIP.IsChecked)       { Set-DHCPIP }
 
-    [System.Windows.MessageBox]::Show("Operações concluídas.","Certare Tools",
+    [System.Windows.MessageBox]::Show("Operações concluídas.","ToolKit",
         'OK','Information') | Out-Null
 })
 

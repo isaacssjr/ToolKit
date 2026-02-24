@@ -103,7 +103,7 @@ function Open-RemoveWindowsAI {
 $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Certare Tools" Height="600" Width="850"
+        Title="ToolKit Isaacs" Height="600" Width="850"
         WindowStartupLocation="CenterScreen"
         Background="#FF000000" Foreground="White"
         ResizeMode="NoResize" WindowStyle="None">
@@ -117,7 +117,7 @@ $xaml = @"
         <!-- Cabeçalho -->
         <Border Grid.Row="0" Background="#FF000000">
             <Grid>
-                <TextBlock Text="Certare Tools" HorizontalAlignment="Center" VerticalAlignment="Center"
+                <TextBlock Text="ToolKit Isaacs" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="28" FontWeight="Bold" Foreground="#00FFFF"/>
             </Grid>
         </Border>

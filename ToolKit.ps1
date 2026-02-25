@@ -393,7 +393,7 @@ function Open-RemoveWindowsAI {
 $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Certare Tools" Height="650" Width="900"
+        Title="Isaac Tools" Height="650" Width="900"
         WindowStartupLocation="CenterScreen"
         Background="#FF000000" Foreground="White"
         ResizeMode="NoResize" WindowStyle="None">
@@ -407,7 +407,7 @@ $xaml = @"
         <!-- Cabeçalho -->
         <Border Grid.Row="0" Background="#FF000000">
             <Grid>
-                <TextBlock Text="Certare Tools" HorizontalAlignment="Center" VerticalAlignment="Center"
+                <TextBlock Text="Isaac Tools" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="28" FontWeight="Bold" Foreground="#00FFFF"/>
             </Grid>
         </Border>
@@ -528,13 +528,13 @@ $btnApply.Add_Click({
         if ($chkCleanupBasic.IsChecked)   { Run-SystemCleanupBasic }
         if ($chkCleanupAggress.IsChecked) { Run-SystemCleanupAggressive }
 
-        [System.Windows.MessageBox]::Show("Operações concluídas.","Certare Tools",
+        [System.Windows.MessageBox]::Show("Operações concluídas.","Isaac Tools",
             'OK','Information') | Out-Null
     }
     catch {
         [System.Windows.MessageBox]::Show(
             "Erro durante a execução:`n$($_.Exception.Message)",
-            "Certare Tools",'OK','Error') | Out-Null
+            "Isaac Tools",'OK','Error') | Out-Null
     }
 })
 

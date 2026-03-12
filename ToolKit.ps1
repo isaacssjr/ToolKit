@@ -14,7 +14,6 @@ function Write-Status {
 
 #==========================
 # MÓDULO CORE – LIMPEZA / USUÁRIOS / INVENTÁRIO
-# (seu Win-Toolkit-Core.ps1, só removi Set-StrictMode pra não quebrar o XAML)
 #==========================
 
 $ErrorActionPreference = 'Continue'
@@ -297,8 +296,6 @@ function Invoke-CleanupOptimizations {
   }
 }
 
-# (demais funções de usuário/inventário não usei na GUI agora, mas podem ficar aqui se quiser)
-
 #==========================
 # Funções específicas do ToolKit (Autodesk, SFC, etc.)
 #==========================
@@ -318,7 +315,7 @@ function Run-System-Repair {
 
 function Open-Massgrave {
     Write-Status "Abrindo Massgrave..."
-    irm https://get.activated.win | iex
+    irm "https://get.activated.win" | iex
 }
 
 function Install-VC-Redist {
@@ -327,11 +324,11 @@ function Install-VC-Redist {
     $env:TEMPVC = Join-Path $env:TEMP 'vc_redist'
     mkdir $env:TEMPVC -Force | Out-Null
 
-    curl.exe -L -o "$env:TEMPVC\vc_redist.x86.exe" https://aka.ms/vc14/vc_redist.x86.exe
+    curl.exe -L -o "$env:TEMPVC\vc_redist.x86.exe" "https://aka.ms/vc14/vc_redist.x86.exe"
     & "$env:TEMPVC\vc_redist.x86.exe" /install /quiet /norestart
 
     if ($env:ProgramFiles -and ${env:ProgramFiles(x86)}) {
-        curl.exe -L -o "$env:TEMPVC\vc_redist.x64.exe" https://aka.ms/vc14/vc_redist.x64.exe
+        curl.exe -L -o "$env:TEMPVC\vc_redist.x64.exe" "https://aka.ms/vc14/vc_redist.x64.exe"
         & "$env:TEMPVC\vc_redist.x64.exe" /install /quiet /norestart
     }
 
@@ -386,6 +383,16 @@ function Open-RemoveWindowsAI {
     ))
 }
 
+function Open-WinUtil-Stable {
+    Write-Status "Abrindo WinUtil (Stable)..."
+    irm "https://christitus.com/win" | iex
+}
+
+function Open-WinUtil-Dev {
+    Write-Status "Abrindo WinUtil (Dev)..."
+    irm "https://christitus.com/windev" | iex
+}
+
 #==========================
 # XAML da GUI
 #==========================
@@ -401,7 +408,7 @@ $xaml = @"
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
 
         <!-- Cabeçalho -->
@@ -417,7 +424,7 @@ $xaml = @"
             <StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                    <CheckBox x:Name="chkAutodeskRegs" IsChecked="True" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="chkAutodeskRegs" IsChecked="False" VerticalAlignment="Center"/>
                     <TextBlock Text="Adicionar registros Autodesk (AllowSystemContextInstall / DisableLUAInRepair)"
                                Margin="10,0,0,0" FontSize="16" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -428,11 +435,7 @@ $xaml = @"
                                Margin="10,0,0,0" FontSize="16" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                    <CheckBox x:Name="chkMassgrave" VerticalAlignment="Center"/>
-                    <TextBlock Text="Abrir Massgrave (irm https://get.activated.win | iex)"
-                               Margin="10,0,0,0" FontSize="16" VerticalAlignment="Center"/>
-                </StackPanel>
+                <!-- Massgrave agora será botão no rodapé; checkbox removido -->
 
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <CheckBox x:Name="chkVC" VerticalAlignment="Center"/>
@@ -469,22 +472,41 @@ $xaml = @"
 
         <!-- Rodapé -->
         <Grid Grid.Row="2" Margin="20,0,20,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <Button x:Name="btnOpenRWAI" Grid.Column="0" Margin="0,10,10,0" Height="40"
-                    Content="Abrir RemoveWindowsAI" Background="#FF333333" Foreground="White"
-                    FontSize="14"/>
+            <!-- Linha de botões de ferramentas externas -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button x:Name="btnOpenRWAI" Margin="0,10,10,0" Height="30"
+                        Content="Abrir RemoveWindowsAI" Background="#FF333333" Foreground="White"
+                        FontSize="14"/>
+                <Button x:Name="btnOpenWinUtil" Margin="0,10,10,0" Height="30"
+                        Content="Abrir WinUtil" Background="#FF333333" Foreground="White"
+                        FontSize="14"/>
+                <Button x:Name="btnOpenWinUtilDev" Margin="0,10,10,0" Height="30"
+                        Content="Abrir WinUtil (Dev)" Background="#FF333333" Foreground="White"
+                        FontSize="14"/>
+                <Button x:Name="btnOpenMassgrave" Margin="0,10,10,0" Height="30"
+                        Content="Abrir Massgrave" Background="#FF333333" Foreground="White"
+                        FontSize="14"/>
+            </StackPanel>
 
-            <Button x:Name="btnCancel" Grid.Column="1" Margin="0,10,10,0" Width="120" Height="40"
-                    Content="Cancelar" Background="#FF990000" Foreground="White" FontSize="14"/>
+            <!-- Linha de botões principais -->
+            <Grid Grid.Row="1" Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Button x:Name="btnApply" Grid.Column="2" Margin="0,10,0,0" Width="120" Height="40"
-                    Content="Aplicar" Background="#FF00AA00" Foreground="White" FontSize="14"/>
+                <Button x:Name="btnCancel" Grid.Column="1" Margin="0,10,10,0" Width="120" Height="40"
+                        Content="Cancelar" Background="#FF990000" Foreground="White" FontSize="14"/>
 
+                <Button x:Name="btnApply" Grid.Column="2" Margin="0,10,0,0" Width="120" Height="40"
+                        Content="Aplicar" Background="#FF00AA00" Foreground="White" FontSize="14"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
@@ -499,29 +521,57 @@ $window = [Windows.Markup.XamlReader]::Load($reader)
 
 $chkAutodeskRegs   = $window.FindName("chkAutodeskRegs")
 $chkSystemRepair   = $window.FindName("chkSystemRepair")
-$chkMassgrave      = $window.FindName("chkMassgrave")
 $chkVC             = $window.FindName("chkVC")
 $chkStaticIP       = $window.FindName("chkStaticIP")
 $chkDHCPIP         = $window.FindName("chkDHCPIP")
 $chkCleanupBasic   = $window.FindName("chkCleanupBasic")
 $chkCleanupAggress = $window.FindName("chkCleanupAggressive")
 
-$btnApply    = $window.FindName("btnApply")
-$btnCancel   = $window.FindName("btnCancel")
-$btnOpenRWAI = $window.FindName("btnOpenRWAI")
+$btnApply        = $window.FindName("btnApply")
+$btnCancel       = $window.FindName("btnCancel")
+$btnOpenRWAI     = $window.FindName("btnOpenRWAI")
+$btnOpenWinUtil  = $window.FindName("btnOpenWinUtil")
+$btnOpenWinUtilDev = $window.FindName("btnOpenWinUtilDev")
+$btnOpenMassgrave = $window.FindName("btnOpenMassgrave")
 
 $btnCancel.Add_Click({ $window.Close() })
 
 $btnOpenRWAI.Add_Click({
-    Open-RemoveWindowsAI
-    $window.Close()
+    try { Open-RemoveWindowsAI } catch {
+        [System.Windows.MessageBox]::Show(
+            "Erro ao abrir RemoveWindowsAI:`n$($_.Exception.Message)",
+            "Isaac Tools",'OK','Error') | Out-Null
+    }
+})
+
+$btnOpenWinUtil.Add_Click({
+    try { Open-WinUtil-Stable } catch {
+        [System.Windows.MessageBox]::Show(
+            "Erro ao abrir WinUtil:`n$($_.Exception.Message)",
+            "Isaac Tools",'OK','Error') | Out-Null
+    }
+})
+
+$btnOpenWinUtilDev.Add_Click({
+    try { Open-WinUtil-Dev } catch {
+        [System.Windows.MessageBox]::Show(
+            "Erro ao abrir WinUtil (Dev):`n$($_.Exception.Message)",
+            "Isaac Tools",'OK','Error') | Out-Null
+    }
+})
+
+$btnOpenMassgrave.Add_Click({
+    try { Open-Massgrave } catch {
+        [System.Windows.MessageBox]::Show(
+            "Erro ao abrir Massgrave:`n$($_.Exception.Message)",
+            "Isaac Tools",'OK','Error') | Out-Null
+    }
 })
 
 $btnApply.Add_Click({
     try {
         if ($chkAutodeskRegs.IsChecked)   { Add-Autodesk-Regs }
         if ($chkSystemRepair.IsChecked)   { Run-System-Repair }
-        if ($chkMassgrave.IsChecked)      { Open-Massgrave }
         if ($chkVC.IsChecked)             { Install-VC-Redist }
         if ($chkStaticIP.IsChecked)       { Set-StaticIP }
         if ($chkDHCPIP.IsChecked)         { Set-DHCPIP }
@@ -543,7 +593,6 @@ $btnApply.Add_Click({
 #==========================
 
 if ($nonInteractive) {
-    # aqui poderia rodar alguns padrões se você quiser, por enquanto só abre GUI
     $window.ShowDialog() | Out-Null
 } else {
     $window.ShowDialog() | Out-Null

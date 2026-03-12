@@ -297,7 +297,7 @@ function Invoke-CleanupOptimizations {
 }
 
 #==========================
-# Funções específicas do ToolKit (Autodesk, SFC, etc.)
+# Funções específicas do ToolKit
 #==========================
 
 function Add-Autodesk-Regs {
@@ -408,7 +408,7 @@ $xaml = @"
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="140"/>
         </Grid.RowDefinitions>
 
         <!-- Cabeçalho -->
@@ -434,8 +434,6 @@ $xaml = @"
                     <TextBlock Text="Executar reparo de sistema (sfc /scannow + DISM /RestoreHealth)"
                                Margin="10,0,0,0" FontSize="16" VerticalAlignment="Center"/>
                 </StackPanel>
-
-                <!-- Massgrave agora será botão no rodapé; checkbox removido -->
 
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <CheckBox x:Name="chkVC" VerticalAlignment="Center"/>
@@ -475,6 +473,7 @@ $xaml = @"
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
 
             <!-- Linha de botões de ferramentas externas -->
@@ -493,18 +492,45 @@ $xaml = @"
                         FontSize="14"/>
             </StackPanel>
 
-            <!-- Linha de botões principais -->
-            <Grid Grid.Row="1" Margin="0,0,0,0">
+            <!-- Log + barra de progresso -->
+            <Grid Grid.Row="1" Margin="0,5,0,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="txtLog"
+                         Grid.Row="0"
+                         Margin="0,0,0,5"
+                         Background="#FF111111"
+                         Foreground="White"
+                         FontSize="12"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"/>
+
+                <ProgressBar x:Name="pbStatus"
+                             Grid.Row="1"
+                             Height="16"
+                             Minimum="0"
+                             Maximum="100"
+                             IsIndeterminate="False"
+                             Visibility="Collapsed"/>
+            </Grid>
+
+            <!-- Botões principais -->
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="btnCancel" Grid.Column="1" Margin="0,10,10,0" Width="120" Height="40"
+                <Button x:Name="btnCancel" Grid.Column="1" Margin="0,0,10,0" Width="120" Height="30"
                         Content="Cancelar" Background="#FF990000" Foreground="White" FontSize="14"/>
 
-                <Button x:Name="btnApply" Grid.Column="2" Margin="0,10,0,0" Width="120" Height="40"
+                <Button x:Name="btnApply" Grid.Column="2" Margin="0,0,0,0" Width="120" Height="30"
                         Content="Aplicar" Background="#FF00AA00" Foreground="White" FontSize="14"/>
             </Grid>
         </Grid>
@@ -527,17 +553,31 @@ $chkDHCPIP         = $window.FindName("chkDHCPIP")
 $chkCleanupBasic   = $window.FindName("chkCleanupBasic")
 $chkCleanupAggress = $window.FindName("chkCleanupAggressive")
 
-$btnApply        = $window.FindName("btnApply")
-$btnCancel       = $window.FindName("btnCancel")
-$btnOpenRWAI     = $window.FindName("btnOpenRWAI")
-$btnOpenWinUtil  = $window.FindName("btnOpenWinUtil")
+$btnApply          = $window.FindName("btnApply")
+$btnCancel         = $window.FindName("btnCancel")
+$btnOpenRWAI       = $window.FindName("btnOpenRWAI")
+$btnOpenWinUtil    = $window.FindName("btnOpenWinUtil")
 $btnOpenWinUtilDev = $window.FindName("btnOpenWinUtilDev")
-$btnOpenMassgrave = $window.FindName("btnOpenMassgrave")
+$btnOpenMassgrave  = $window.FindName("btnOpenMassgrave")
+$txtLog            = $window.FindName("txtLog")
+$pbStatus          = $window.FindName("pbStatus")
+
+# Função simples para logar também na TextBox
+function Add-GuiLog {
+    param([string]$Message)
+    $window.Dispatcher.Invoke([action]{
+        $txtLog.AppendText("$Message`r`n")
+        $txtLog.ScrollToEnd()
+    })
+}
 
 $btnCancel.Add_Click({ $window.Close() })
 
 $btnOpenRWAI.Add_Click({
-    try { Open-RemoveWindowsAI } catch {
+    try {
+        Add-GuiLog "Abrindo RemoveWindowsAI..."
+        Open-RemoveWindowsAI
+    } catch {
         [System.Windows.MessageBox]::Show(
             "Erro ao abrir RemoveWindowsAI:`n$($_.Exception.Message)",
             "Isaac Tools",'OK','Error') | Out-Null
@@ -545,7 +585,10 @@ $btnOpenRWAI.Add_Click({
 })
 
 $btnOpenWinUtil.Add_Click({
-    try { Open-WinUtil-Stable } catch {
+    try {
+        Add-GuiLog "Abrindo WinUtil (Stable)..."
+        Open-WinUtil-Stable
+    } catch {
         [System.Windows.MessageBox]::Show(
             "Erro ao abrir WinUtil:`n$($_.Exception.Message)",
             "Isaac Tools",'OK','Error') | Out-Null
@@ -553,7 +596,10 @@ $btnOpenWinUtil.Add_Click({
 })
 
 $btnOpenWinUtilDev.Add_Click({
-    try { Open-WinUtil-Dev } catch {
+    try {
+        Add-GuiLog "Abrindo WinUtil (Dev)..."
+        Open-WinUtil-Dev
+    } catch {
         [System.Windows.MessageBox]::Show(
             "Erro ao abrir WinUtil (Dev):`n$($_.Exception.Message)",
             "Isaac Tools",'OK','Error') | Out-Null
@@ -561,7 +607,10 @@ $btnOpenWinUtilDev.Add_Click({
 })
 
 $btnOpenMassgrave.Add_Click({
-    try { Open-Massgrave } catch {
+    try {
+        Add-GuiLog "Abrindo Massgrave..."
+        Open-Massgrave
+    } catch {
         [System.Windows.MessageBox]::Show(
             "Erro ao abrir Massgrave:`n$($_.Exception.Message)",
             "Isaac Tools",'OK','Error') | Out-Null
@@ -569,22 +618,32 @@ $btnOpenMassgrave.Add_Click({
 })
 
 $btnApply.Add_Click({
-    try {
-        if ($chkAutodeskRegs.IsChecked)   { Add-Autodesk-Regs }
-        if ($chkSystemRepair.IsChecked)   { Run-System-Repair }
-        if ($chkVC.IsChecked)             { Install-VC-Redist }
-        if ($chkStaticIP.IsChecked)       { Set-StaticIP }
-        if ($chkDHCPIP.IsChecked)         { Set-DHCPIP }
-        if ($chkCleanupBasic.IsChecked)   { Run-SystemCleanupBasic }
-        if ($chkCleanupAggress.IsChecked) { Run-SystemCleanupAggressive }
+    $pbStatus.Visibility = 'Visible'
+    $pbStatus.IsIndeterminate = $true
+    Add-GuiLog "Iniciando operações selecionadas..."
 
+    try {
+        if ($chkAutodeskRegs.IsChecked)   { Add-GuiLog "Aplicando registros Autodesk..."; Add-Autodesk-Regs }
+        if ($chkSystemRepair.IsChecked)   { Add-GuiLog "Executando reparo de sistema..."; Run-System-Repair }
+        if ($chkVC.IsChecked)             { Add-GuiLog "Instalando VC++ Redistributables..."; Install-VC-Redist }
+        if ($chkStaticIP.IsChecked)       { Add-GuiLog "Definindo IP estático..."; Set-StaticIP }
+        if ($chkDHCPIP.IsChecked)         { Add-GuiLog "Voltando IP para DHCP..."; Set-DHCPIP }
+        if ($chkCleanupBasic.IsChecked)   { Add-GuiLog "Executando limpeza básica..."; Run-SystemCleanupBasic }
+        if ($chkCleanupAggress.IsChecked) { Add-GuiLog "Executando limpeza agressiva..."; Run-SystemCleanupAggressive }
+
+        Add-GuiLog "Operações concluídas."
         [System.Windows.MessageBox]::Show("Operações concluídas.","Isaac Tools",
             'OK','Information') | Out-Null
     }
     catch {
+        Add-GuiLog "Erro: $($_.Exception.Message)"
         [System.Windows.MessageBox]::Show(
             "Erro durante a execução:`n$($_.Exception.Message)",
             "Isaac Tools",'OK','Error') | Out-Null
+    }
+    finally {
+        $pbStatus.IsIndeterminate = $false
+        $pbStatus.Visibility = 'Collapsed'
     }
 })
 

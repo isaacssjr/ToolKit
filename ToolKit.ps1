@@ -408,7 +408,7 @@ $xaml = @"
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="140"/>
+            <RowDefinition Height="130"/>
         </Grid.RowDefinitions>
 
         <!-- Cabeçalho -->
@@ -492,16 +492,10 @@ $xaml = @"
                         FontSize="14"/>
             </StackPanel>
 
-            <!-- Log + barra de progresso -->
+            <!-- Log -->
             <Grid Grid.Row="1" Margin="0,5,0,5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="20"/>
-                </Grid.RowDefinitions>
-
                 <TextBox x:Name="txtLog"
-                         Grid.Row="0"
-                         Margin="0,0,0,5"
+                         Margin="0,0,0,0"
                          Background="#FF111111"
                          Foreground="White"
                          FontSize="12"
@@ -509,14 +503,6 @@ $xaml = @"
                          VerticalScrollBarVisibility="Auto"
                          IsReadOnly="True"
                          TextWrapping="Wrap"/>
-
-                <ProgressBar x:Name="pbStatus"
-                             Grid.Row="1"
-                             Height="16"
-                             Minimum="0"
-                             Maximum="100"
-                             IsIndeterminate="False"
-                             Visibility="Collapsed"/>
             </Grid>
 
             <!-- Botões principais -->
@@ -560,7 +546,6 @@ $btnOpenWinUtil    = $window.FindName("btnOpenWinUtil")
 $btnOpenWinUtilDev = $window.FindName("btnOpenWinUtilDev")
 $btnOpenMassgrave  = $window.FindName("btnOpenMassgrave")
 $txtLog            = $window.FindName("txtLog")
-$pbStatus          = $window.FindName("pbStatus")
 
 # Função simples para logar também na TextBox
 function Add-GuiLog {
@@ -618,8 +603,6 @@ $btnOpenMassgrave.Add_Click({
 })
 
 $btnApply.Add_Click({
-    $pbStatus.Visibility = 'Visible'
-    $pbStatus.IsIndeterminate = $true
     Add-GuiLog "Iniciando operações selecionadas..."
 
     try {
@@ -640,10 +623,6 @@ $btnApply.Add_Click({
         [System.Windows.MessageBox]::Show(
             "Erro durante a execução:`n$($_.Exception.Message)",
             "Isaac Tools",'OK','Error') | Out-Null
-    }
-    finally {
-        $pbStatus.IsIndeterminate = $false
-        $pbStatus.Visibility = 'Collapsed'
     }
 })
 
